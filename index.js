@@ -16,16 +16,17 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY
 );
 
-// GET /api/posts
+// GET /api/posts (utilise la vue enrichie)
 app.get("/api/posts", async (req, res) => {
   const { data, error } = await supabase
-    .from("posts")
-    .select("*, author:users(full_name, email)")
+    .from("enriched_posts")
+    .select("*")
     .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
+
 
 // POST /api/posts
 app.post("/api/posts", async (req, res) => {
