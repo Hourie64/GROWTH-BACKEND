@@ -20,7 +20,17 @@ app.get('/', (req, res) => {
 app.get('/api/posts', async (req, res) => {
   const { data, error } = await supabase
     .from('posts')
-    .select('*, users(full_name, avatar_url)');
+    .select(`
+  id,
+  content,
+  created_at,
+  author_id,
+  users (
+    full_name,
+    avatar_url
+  )
+`)
+
 
   if (error) {
     console.error(error);
