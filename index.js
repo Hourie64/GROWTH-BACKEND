@@ -44,3 +44,18 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`🚀 GROWTH API running on port ${PORT}`);
 });
+// Créer un nouveau post
+app.post('/api/posts', async (req, res) => {
+  const { content, author_id } = req.body;
+
+  const { data, error } = await supabase
+    .from('posts')
+    .insert([{ content, author_id }]);
+
+  if (error) {
+    console.error("Erreur post:", error);
+    return res.status(500).json({ error: error.message });
+  }
+
+  res.status(201).json(data[0]);
+});
