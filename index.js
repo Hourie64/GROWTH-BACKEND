@@ -35,22 +35,25 @@ app.get('/api/posts', async (req, res) => {
 });
 
 // Post post (author_id temporaire forcé)
-app.post('/api/posts', async (req, res) => {
+// Créer un post
+app.post("/api/posts", async (req, res) => {
   const { content } = req.body;
 
-  if (!content) {
-    return res.status(400).json({ error: 'Le contenu est requis.' });
-  }
-
-  const author_id = '00000000-0000-0000-0000-000000000001'; // UUID utilisateur par défaut
+  // Simule un user par défaut
+  const DEFAULT_AUTHOR_ID = "00000000-0000-0000-0000-000000000000";
 
   const { data, error } = await supabase
-    .from('posts')
-    .insert([{ content, author_id }])
-    .select();
+    .from("posts")
+    .insert([
+      {
+        content,
+        author_id: DEFAULT_AUTHOR_ID,
+      },
+    ])
+    .select("*, users(full_name, avatar_url)");
 
   if (error) {
-    console.error('❌ Erreur création post:', error.message);
+    console.error("Erreur lors de la publication:", error.message);
     return res.status(500).json({ error: error.message });
   }
 
