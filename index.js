@@ -37,11 +37,22 @@ app.get('/api/posts', async (req, res) => {
 
 // Ajouter un post
 app.post('/api/posts', async (req, res) => {
-  const { content } = req.body;
+  const { content, author_id } = req.body;
+
+  // Sécurité : vérifier que les deux champs sont présents
+  if (!content || !author_id) {
+    return res.status(400).json({ error: 'Champ content ou author_id manquant' });
+  }
 
   const { data, error } = await supabase
     .from('posts')
-    .insert([{ content, author_id: null }]) // anonyme pour l'instant
+    .insert([{ content, author_id }]);
 
   if (error) {
-    console.error('Erreur création
+    console.error('Erreur création post :', error);
+    return res.status(500).json({ error: error.message });
+  }
+
+  res.status(201).json(data[0]);
+});
+
