@@ -19,18 +19,18 @@ app.get('/', (req, res) => {
   res.send('🎉 GROWTH API is running !');
 });
 
-// POST /api/posts
-app.post('/api/posts', async (req, res) => {
-  const { content } = req.body;
+// Simule un user par défaut
+const DEFAULT_AUTHOR_ID = "8cc03a68-9015-4d1a-bb7b-c847a5b703c0";
 
-  // ID temporaire d’un utilisateur par défaut
-  const DEFAULT_AUTHOR_ID = "fab4beeb-e052-47db-b15e-00cd0ec0bf29";
+app.post("/api/posts", async (req, res) => {
+  const { content } = req.body;
 
   const { data, error } = await supabase
     .from("posts")
     .insert([
       {
         content,
+        title: content.slice(0, 50), // <-- Ajout d’un titre (extrait du contenu)
         author_id: DEFAULT_AUTHOR_ID,
       },
     ])
@@ -43,6 +43,7 @@ app.post('/api/posts', async (req, res) => {
 
   res.status(201).json(data[0]);
 });
+
 
 
 // Post post (author_id temporaire forcé)
