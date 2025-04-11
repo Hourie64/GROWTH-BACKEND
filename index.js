@@ -9,18 +9,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Initialise Supabase
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
 );
 
-// Test de connexion
+// Route test
 app.get('/', (req, res) => {
   res.send('🎉 GROWTH API is running !');
 });
 
-// Récupérer tous les posts
+// Récupérer les posts avec les infos de l’auteur
 app.get('/api/posts', async (req, res) => {
   const { data, error } = await supabase
     .from('posts')
@@ -28,34 +27,38 @@ app.get('/api/posts', async (req, res) => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Erreur récupération posts :', error);
+    console.error('❌ Erreur récupération des posts:', error.message);
     return res.status(500).json({ error: error.message });
   }
 
   res.json(data);
 });
 
-// Ajouter un post
+// Créer un nouveau post
 app.post('/api/posts', async (req, res) => {
   const { content } = req.body;
 
-  // Si pas de contenu, on ne publie pas
-  if (!content) {
-    return res.status(400).json({ error: 'Champ content manquant' });
-  }
+  const { data: user, error: userError } = await supabase.auth.getUser();
 
-  // TEMP : author_id forcé pour test
-  const author_id = '00000000-0000-0000-0000-000000000001'; // ← à adapter si tu veux
+  if (userError || !user?.user) {
+    console.error('❌ Aucun utilisateur connecté');
+    return res.status(401).json({ error: 'Utilisateur non authentifié' });
+  }
 
   const { data, error } = await supabase
     .from('posts')
-    .insert([{ content, author_id }]);
+    .insert([{ content, author_id: user.user.id }]);
 
   if (error) {
-    console.error('Erreur création post :', error);
+    console.error('❌ Erreur création post:', error.message);
     return res.status(500).json({ error: error.message });
   }
 
   res.status(201).json(data[0]);
 });
 
+// Démarrage du serveur
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`🚀 GROWTH API running on port ${PORT}`);
+});
