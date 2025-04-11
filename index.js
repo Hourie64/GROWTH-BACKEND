@@ -40,7 +40,7 @@ app.post("/api/posts", async (req, res) => {
   const { content } = req.body;
 
   // Simule un user par défaut
-  const DEFAULT_AUTHOR_ID = "00000000-0000-0000-0000-000000000000";
+  const DEFAULT_AUTHOR_ID = "8cc03a68-9015-4d1a-bb7b-c847a5b703c0";
 
   const { data, error } = await supabase
     .from("posts")
