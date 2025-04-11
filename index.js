@@ -9,38 +9,39 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Initialise Supabase
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
 );
 
-// GET : récupérer les posts
+// Test de connexion
+app.get('/', (req, res) => {
+  res.send('🎉 GROWTH API is running !');
+});
+
+// Récupérer tous les posts
 app.get('/api/posts', async (req, res) => {
   const { data, error } = await supabase
     .from('posts')
     .select('*, users(full_name, avatar_url)')
     .order('created_at', { ascending: false });
 
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) {
+    console.error('Erreur récupération posts :', error);
+    return res.status(500).json({ error: error.message });
+  }
+
   res.json(data);
 });
 
-// POST : ajouter un post
+// Ajouter un post
 app.post('/api/posts', async (req, res) => {
   const { content } = req.body;
 
-  const { data: user } = await supabase.auth.getUser();
-  const userId = user?.id || null;
-
   const { data, error } = await supabase
     .from('posts')
-    .insert([{ content, author_id: userId }]);
+    .insert([{ content, author_id: null }]) // anonyme pour l'instant
 
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json(data);
-});
-
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log(`🚀 GROWTH API running on port ${PORT}`);
-});
+  if (error) {
+    console.error('Erreur création
