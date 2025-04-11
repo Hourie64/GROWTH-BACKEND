@@ -37,12 +37,15 @@ app.get('/api/posts', async (req, res) => {
 
 // Ajouter un post
 app.post('/api/posts', async (req, res) => {
-  const { content, author_id } = req.body;
+  const { content } = req.body;
 
-  // Sécurité : vérifier que les deux champs sont présents
-  if (!content || !author_id) {
-    return res.status(400).json({ error: 'Champ content ou author_id manquant' });
+  // Si pas de contenu, on ne publie pas
+  if (!content) {
+    return res.status(400).json({ error: 'Champ content manquant' });
   }
+
+  // TEMP : author_id forcé pour test
+  const author_id = '00000000-0000-0000-0000-000000000001'; // ← à adapter si tu veux
 
   const { data, error } = await supabase
     .from('posts')
