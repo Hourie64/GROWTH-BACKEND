@@ -19,20 +19,31 @@ app.get('/', (req, res) => {
   res.send('🎉 GROWTH API is running !');
 });
 
-// Get posts
-app.get('/api/posts', async (req, res) => {
+// POST /api/posts
+app.post('/api/posts', async (req, res) => {
+  const { content } = req.body;
+
+  // ID temporaire d’un utilisateur par défaut
+  const DEFAULT_AUTHOR_ID = "fab4beeb-e052-47db-b15e-00cd0ec0bf29";
+
   const { data, error } = await supabase
-    .from('posts')
-    .select('*, users(full_name)')
-    .order('created_at', { ascending: false });
+    .from("posts")
+    .insert([
+      {
+        content,
+        author_id: DEFAULT_AUTHOR_ID,
+      },
+    ])
+    .select("*, users(full_name, avatar_url)");
 
   if (error) {
-    console.error('❌ Erreur récupération des posts:', error.message);
+    console.error("Erreur lors de la publication :", error.message);
     return res.status(500).json({ error: error.message });
   }
 
-  res.json(data);
+  res.status(201).json(data[0]);
 });
+
 
 // Post post (author_id temporaire forcé)
 // Créer un post
