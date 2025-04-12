@@ -29,7 +29,7 @@ app.get('/api/posts', async (req, res) => {
 
 app.post('/api/posts', async (req, res) => {
   const { content } = req.body;
-  const DEFAULT_AUTHOR_ID = 'TON_UUID_ICI'; // à remplacer par l'UUID "Utilisateur par défaut"
+  const DEFAULT_AUTHOR_ID =  fdab6b0d-e052-4f4b-91b4-069cdcc6b725
   const { data, error } = await supabase
     .from('posts')
     .insert([{ content, author_id: DEFAULT_AUTHOR_ID }])
